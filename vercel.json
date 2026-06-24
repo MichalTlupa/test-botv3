@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "functions": {
+    "api/interactions.js": {
+      "memory": 512,
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/interactions",
+      "dest": "/api/interactions.js"
+    }
+  ]
+}
