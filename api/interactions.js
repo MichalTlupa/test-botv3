@@ -4,7 +4,7 @@
  * Vercel Serverless Function
  */
 
-import { verifyKeyMiddleware } from 'discord-interactions';
+import { verifyKey } from 'discord-interactions';
 import { InteractionType, InteractionResponseType } from 'discord-api-types/v10';
 import { kv } from '@vercel/kv';
 import dotenv from 'dotenv';
@@ -204,16 +204,18 @@ export async function handleInteraction(req, res) {
 }
 
 /**
- * Ověření Discord podpisu (bezpečnost)
+ * Bezpečné ověření Discord podpisu (kryptografie)
  */
 function verifyRequest(signature, timestamp, body) {
-  // V produkci by se měl používat nacl pro ověření
-  // Pro dev je to zjednodušené
   if (!DISCORD_PUBLIC_KEY) {
-    console.warn('⚠️ DISCORD_PUBLIC_KEY není nastavený!');
+    console.warn('⚠️ DISCORD_PUBLIC_KEY není nastavený v Environment Variables!');
     return false;
   }
-  return true;
+
+  // Převedení těla na textový řetězec, pokud jej Vercel předal jako objekt
+  const stringifiedBody = typeof body === 'string' ? body : JSON.stringify(body);
+
+  return verifyKey(stringifiedBody, signature, timestamp, DISCORD_PUBLIC_KEY);
 }
 
 /**
